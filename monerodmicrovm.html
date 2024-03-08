@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<head>
+	<title>Building a monerod microVM</title>
+	<link rel="stylesheet" href="style.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body class="bg-slate-900">
+	<div class="relative mx-auto sm:mt-[10vh] mt-[10vh] p-4 sm:p-12 max-w-[96em] overflow-x-hidden">
+		<div class="flex flex-col-reverse sm:flex-row content-start">
+			<div class="flex flex-col flex-nowrap mx-auto items-center sm:min-w-[20em] sm:items-start max-w-xs">
+				<a href="https://syntheticbird45.github.io/">
+					<svg xmlns="http://www.w3.org/2000/svg" height="3em" fill="#64748b" viewBox="0 0 512 512" class="mb-8">
+						<path d="M 0 457.14285 Q 1.1428572 474.2857 18.285715 475.42856 Q 35.42857 474.2857 36.57143 457.14285 L 36.57143 54.857143 L 36.57143 54.857143 Q 35.42857 37.714287 18.285715 36.57143 Q 1.1428572 37.714287 0 54.857143 L 0 457.14285 L 0 457.14285 Z M 115.42857 243.42857 Q 104 256 115.42857 268.57144 L 261.7143 414.85715 L 261.7143 414.85715 Q 274.2857 426.2857 286.85715 414.85715 Q 298.2857 402.2857 286.85715 389.7143 L 172.57143 274.2857 L 172.57143 274.2857 L 292.57144 274.2857 L 493.7143 274.2857 Q 510.85715 273.14285 512 256 Q 510.85715 238.85715 493.7143 237.71428 L 292.57144 237.71428 L 172.57143 237.71428 L 286.85715 122.28571 L 286.85715 122.28571 Q 298.2857 109.71429 286.85715 97.14286 Q 274.2857 85.71429 261.7143 97.14286 L 115.42857 243.42857 L 115.42857 243.42857 Z"/>
+					</svg>
+				</a>
+				<img class="w-32 rounded-full border-2 border-slate-800 m-3" src="profile_picture.png" alt="">
+				<p class="text-center sm:text-left font-light text-slate-300 text-2xl">SyntheticBird45</p>
+				<p class="text-center sm:text-left font-normal text-slate-600 text-lg mt-2">They/them</p>
+				<p class="text-center sm:text-left font-normal text-slate-500 text-lg mt-2">x86/C/Rust developer. Monero enthusiast. Cryptography fan. Binary vulnerability research admirer</p>
+				<div class="flex flex-row w-full gap-8 justify-around sm:justify-start mt-4">
+					<a class=" w-6 text-slate-600" href="https://github.com/SyntheticBird45">
+						<svg xmlns="http://www.w3.org/2000/svg" width="2rem" fill="currentColor" viewBox="0 0 496 484">
+							<path d="M 166 389 Q 165 393 161 393 Q 155 393 155 389 Q 156 386 160 386 Q 165 386 166 389 L 166 389 Z M 135 385 Q 134 388 139 390 Q 144 391 145 388 Q 146 384 141 383 Q 136 382 135 385 L 135 385 Z M 179 383 Q 174 384 174 388 Q 175 391 180 391 Q 185 389 185 386 Q 184 383 179 383 L 179 383 Z M 245 0 Q 138 2 70 70 L 70 70 Q 2 138 0 244 Q 1 329 47 393 Q 93 457 170 483 Q 188 484 187 471 Q 187 467 187 456 Q 187 433 187 410 Q 185 410 168 412 Q 150 413 130 408 Q 110 402 102 380 Q 102 378 94 364 Q 86 351 74 343 Q 72 342 66 335 Q 59 329 76 328 Q 77 327 90 332 Q 103 336 114 354 Q 132 381 153 381 Q 175 381 187 375 Q 191 351 203 341 Q 159 339 126 319 Q 93 300 91 230 Q 91 210 97 197 Q 102 184 114 172 Q 112 166 110 148 Q 108 130 117 104 Q 135 101 159 115 Q 184 128 186 131 Q 186 131 186 131 Q 216 122 249 122 Q 281 122 312 131 Q 312 130 325 122 Q 337 114 353 108 Q 369 101 381 104 Q 390 130 388 148 Q 386 166 383 172 Q 395 184 402 197 Q 409 210 409 230 Q 408 278 392 301 Q 375 323 349 331 Q 323 339 294 341 Q 310 352 311 387 Q 311 424 311 453 Q 311 466 311 471 Q 310 484 328 483 Q 404 457 450 393 Q 495 329 496 244 Q 495 174 462 119 Q 428 64 372 32 Q 315 1 245 0 L 245 0 Z M 97 345 Q 95 347 98 350 Q 101 353 103 351 Q 105 349 102 346 Q 100 343 97 345 L 97 345 Z M 86 337 Q 86 339 89 341 Q 92 342 93 340 Q 94 338 91 336 Q 88 335 86 337 L 86 337 Z M 119 372 Q 117 375 120 379 Q 124 382 127 380 Q 128 377 125 373 Q 121 370 119 372 L 119 372 Z M 107 358 Q 105 360 107 364 Q 110 367 113 366 Q 115 364 113 360 Q 110 356 107 358 L 107 358 Z" />
+						</svg>
+					</a>
+					<a class=" w-6 text-slate-600" href="https://www.reddit.com/user/ComprehensiveMenu856/">
+						<svg xmlns="http://www.w3.org/2000/svg" height="2rem" fill="currentColor" viewBox="0 0 496 496">
+							<path d="M 194 298 Q 171 295 169 273 Q 171 250 194 248 Q 216 250 218 273 Q 216 295 194 298 L 194 298 Z M 496 248 Q 495 317 462 373 L 462 373 Q 429 429 373 462 L 373 462 Q 317 495 248 496 Q 179 495 123 462 Q 67 429 34 373 Q 1 317 0 248 Q 1 179 34 123 Q 67 67 123 34 Q 179 1 248 0 Q 317 1 373 34 Q 429 67 462 123 Q 495 179 496 248 L 496 248 Z M 364 207 Q 349 207 340 217 Q 305 193 254 190 L 271 112 L 327 124 Q 329 147 351 149 Q 374 147 376 124 Q 374 101 351 99 Q 336 100 329 113 L 268 99 Q 263 99 261 104 L 242 190 Q 191 193 156 217 Q 147 207 132 207 Q 106 209 100 232 Q 95 255 118 270 Q 116 277 116 285 Q 118 326 155 352 Q 192 379 248 380 Q 304 379 342 352 Q 379 326 381 285 Q 381 277 379 269 Q 401 255 396 232 Q 390 209 364 207 L 364 207 Z M 295 323 Q 279 337 248 337 L 248 337 Q 217 336 201 323 Q 197 320 193 323 Q 189 328 193 332 Q 213 349 248 349 Q 283 349 303 332 Q 307 328 303 323 Q 299 320 295 323 L 295 323 Z M 303 248 Q 280 250 278 273 Q 280 295 303 298 Q 325 295 327 273 Q 325 250 303 248 L 303 248 Z" />
+						</svg>
+					</a>
+					<a class=" w-6 text-slate-600" href="https://matrix.to/#/@someoneelse495495:matrix.org">
+						<svg xmlns="http://www.w3.org/2000/svg" width="2rem" fill="currentColor" viewBox="0 0 520 520">
+							<path d="M13.7,11.9v496.2h35.7V520H0V0h49.4v11.9H13.7z"/>
+							<path d="M166.3,169.2v25.1h0.7c6.7-9.6,14.8-17,24.2-22.2c9.4-5.3,20.3-7.9,32.5-7.9c11.7,0,22.4,2.3,32.1,6.8  c9.7,4.5,17,12.6,22.1,24c5.5-8.1,13-15.3,22.4-21.5c9.4-6.2,20.6-9.3,33.5-9.3c9.8,0,18.9,1.2,27.3,3.6c8.4,2.4,15.5,6.2,21.5,11.5  c6,5.3,10.6,12.1,14,20.6c3.3,8.5,5,18.7,5,30.7v124.1h-50.9V249.6c0-6.2-0.2-12.1-0.7-17.6c-0.5-5.5-1.8-10.3-3.9-14.3  c-2.2-4.1-5.3-7.3-9.5-9.7c-4.2-2.4-9.9-3.6-17-3.6c-7.2,0-13,1.4-17.4,4.1c-4.4,2.8-7.9,6.3-10.4,10.8c-2.5,4.4-4.2,9.4-5,15.1  c-0.8,5.6-1.3,11.3-1.3,17v103.3h-50.9v-104c0-5.5-0.1-10.9-0.4-16.3c-0.2-5.4-1.3-10.3-3.1-14.9c-1.8-4.5-4.8-8.2-9-10.9  c-4.2-2.7-10.3-4.1-18.5-4.1c-2.4,0-5.6,0.5-9.5,1.6c-3.9,1.1-7.8,3.1-11.5,6.1c-3.7,3-6.9,7.3-9.5,12.9c-2.6,5.6-3.9,13-3.9,22.1  v107.6h-50.9V169.2H166.3z"/>
+							<path d="M506.3,508.1V11.9h-35.7V0H520v520h-49.4v-11.9H506.3z"/>
+						</svg>
+					</a>
+				</div>
+			</div>
+			<div class="markdown p-0 sm:p-12 pt-12 min-w-0 sm:min-w-[50em] text-slate-300 text-pretty text-lg font-normal">
+				<h1 class="text-3xl sm:text-6xl text-wrap text-center mb-20 text-wrap font-light text-slate-500">A before the time look at building a monerod microVM</h1>
+					<p>Since the introduction of <a href="https://learn.microsoft.com/en-us/windows-hardware/design/device-experiences/oem-vbs">virtualization based security for Windows</a>, number of security enthusiasts and companies have drawn interest into leveraging hardware assisted virtualization for security purpose. The introduction of <a href="https://lwn.net/Articles/836693/">protected KVM by Google</a> into the linux kernel, as well as <a href="https://android-developers.googleblog.com/2023/12/virtual-machines-as-core-android-primitive.html">its very soon usage in android</a> through <a href="https://source.android.com/docs/core/virtualization">AVF</a> and <a href="https://source.android.com/docs/core/virtualization/microdroid">microdroid</a> also show signs of interests into virtualization for security. In combination with <a href="https://developer.arm.com/-/media/Arm%20Developer%20Community/PDF/Arm_Memory_Tagging_Extension_Whitepaper.pdf">ARM Memory tagging extension</a> into the Pixel 8 series and <a href="https://grapheneos.org/releases#2023103000">its early support from GrapheneOS</a>, Google's android security model have a bright future ahead!</p>
+					<p>However, <a href="https://i.kym-cdn.com/entries/icons/original/000/034/772/Untitled-1.png">I'm broke…</a> And while I can't afford a Pixel 8, there are a fair number of things I wish to virtualize on my noble x86_64 linux server, in order to improve my operational security. Monero is actively being <a href="https://www.coindesk.com/policy/2022/11/15/privacy-enhancing-crypto-coins-could-be-banned-under-leaked-eu-plans/">targeted</a> by <a href="https://sam.gov/opp/3b7875d5236b47f6a77f64c19251af60/view?index=opp">numerous</a> advanced adversaries, and I thought it would be the first software to look at.</p>
+					<p>In this post, I'll share with you my experience of trying to create a fully virtualized, not yet memory-efficient, secure microVM to run your isolated Monero daemon. A microVM is a type of virtual machine designed to be highly efficient with a low system footprint. The aim is to run individual software or sets of programs within a microVM with minimal overhead. Make sure to read the end before diving into the installation</p>
+					<blockquote>
+					  <p><strong>Annotation:</strong> pKVM is an extension of the Linux KVM mechanism that provides protection to the guest OS from host tampering with its memory. While it is described as requiring ARM processors, similar protection can be achieved using confidential computing extensions such as x86 AMD-SEV (which opened its firmware btw).</p>
+					</blockquote>
+					<h2>A useless but interesting look at hardware-assisted virtualization's history</h2>
+					<p>I've always been interested in hardware-assisted virtualization, which allows a system to run with the same behavior as if it weren't isolated. Cost drove virtualization development in the 1990s and early 2000s, as servers needed an efficient way to handle resources shared between multiple clients. The three existing hypervisors at the time - VMWare, QEMU, and Xen - all used the same binary translation techniques to trap privileged instructions and system calls.</p>
+					<p>In 2005, CPU manufacturers released intel VT-x and AMD-V, which allowed for native, full virtualization of memory context, second level address translations and privileged instruction support. Hypervisors and the Linux kernel with KVM (2007) switched to this technology, offering significant performance improvements and unknowingly laying the groundwork for future security improvements. However, large companies were not yet interested in offering full VMs to their clients, as it wasn't resource-efficient. Instead, they focused on single-purpose services like Google Drive and Netflix.</p>
+					<p>Fast forward to 2011, when Docker emerged, by using 2008's cgroups and linux containers feature, allowing multiple OSes to run on the same kernel. This innovation led to new development practices and automation software, driving the growth of public cloud infrastructure. But here's the catch - OS-level virtualization means security is handled by the OS, and a nearly 20 million line code shared kernel can be a problem. Docker, LXC, and Podman are good at isolating filesystem, but once the kernel is exploited, security collapses. Fully virtualized software avoids this issue since the CPU hides the context and addresses of the supervisor. As a result, there's been renewed interest in hardware-assisted virtualization for its ability to ensure <a href="https://learn.microsoft.com/en-us/windows/security/hardware-security/enable-virtualization-based-protection-of-code-integrity">high security</a> <a href="https://blog.xpnsec.com/gcioptions-in-a-virtualized-world/">or</a>, <a href="https://github.com/changeofpace/VivienneVMM">at</a> <a href="https://github.com/Air14/HyperHide">the</a> <a href="https://blog.xpnsec.com/bring-your-own-vm-mac-edition/">opposite</a>, <a href="https://github.com/tandasat/SimpleSvmHook">for</a> <a href="https://github.com/MellowNight/AetherVisor">hacking</a> <a href="https://github.com/Gbps/gbhv">purposes</a>.</p>
+					<blockquote>
+					  <p>The development of cloud and now well-known internet services has been driven by the development of virtualization. <a href="https://en.wikipedia.org/wiki/Timeline_of_virtualization_development">The Wikipedia page on the topic summarizes this very well.</a></p>
+					</blockquote>
+					<blockquote>
+					  <p><strong>Note:</strong> While Windows utilizes Hardware Virtualized Code Integrity (HVCI) to protect the kernel from tampering, several bypasses have emerged. It's important to note, however, that these bypasses are due to implementation flaws rather than any inherent weakness in the hardware. Virtualization remains the most robust isolation mechanism available today. A vulnerability that causes a guest VM to execute code on the host or modify its behavior is called a <strong>Virtual Machine Escape</strong> and <a href="https://en.wikipedia.org/wiki/Virtual_machine_escape">an up to date list exist on wikipedia.</a></p>
+					</blockquote>
+					<h2>The Hypervisor</h2>
+					<p>"For some time now, the Rust programming language has been adopted for its safety, and as a result <a href="https://github.com/rust-vmm">hypervisors written in this language are being developed</a>. Specifically, there are four additional hypervisors that we could consider for our use case: </p>
+					<ul>
+					<li><p><strong>Firecracker</strong> is rust-written hypervisor managed by Amazon and optimized for short-living workloads. It strongly emphazise on security and memory-footprint. However, because Firecracker is designed for very-short living tasks, it do not release memory and is therefore not suitable for our long-living workload.</p></li>
+					<li><p><strong>krunvm</strong> is another rust-written hypervisor that is focused on simplicty and OCI compatibility. It is meant to be used with podman, an alternative to docker. While it ongoing development is interesting, it is still an alpha software and being non-familiar with container images, I prefered to ditch this one too. If you know what you're doing you should give it a try</p></li>
+					<li><p><strong>QEMU</strong> is the ultimate hypervisor nowaday. It is fast, stable and full of features, but because it is so big and written in C, I decided to go without it. Know that it is entirely possible to do what will follow in QEMU.</p></li>
+					<li><p><strong>crosvm</strong> is Google's rust written client purpose hypervisor. It is meant to  be used inside of ChromeOS to support other OS software at native speed using paravirtualization. It is meant to be comparable to QEMU.</p></li>
+					<li><p><strong>cloud-hypervisor</strong> is another rust-written hypervisor that also focus on security, speed and memory footprint for cloud workloads. It is funded by several companies and managed by the Linux foundation. With the help of rust-firmware or cloud-hypervisor's edk2 branch, windows is also supported. It also support VFIO for GPU users or PCI bindings</p></li>
+					</ul>
+					<p>I decided to go with <code>cloud-hypervisor</code> for its ease of use and cool features</p>
+					<h2>The kernel</h2>
+					<p>We need to compile a custom Linux kernel with specific parameters to run our microVM under cloud-hypervisor.</p>
+					<h3>Cloning the linux-hardened kernel</h3>
+					<p>Guest security is also important as it is part of our defense in depth strategy against an advanced attacker trying to mess with the hypervisor or simply alterate the intended software behavior (turn a legit monerod into a malicious one). That's why for VMs, you should always use the <a href="https://github.com/anthraxx/linux-hardened">linux-hardened</a> kernel that is safer than vanilla one. Let's clone its repo and compile it right away:</p>
+					<pre><code>~$ mkdir monerod-microvm &amp;&amp; cd monerod-microvm/
+~/monerod-microvm$ git clone https://github.com/anthraxx/linux-hardened -b 6.7 // Replace branch with latest version</code></pre>
+					<blockquote>
+					  <p><strong>Note:</strong> The linux-hardened kernel disable by default a number of features, such as user namespaces, io_uring, unprivileged eBPF and more. It is good for server and standard desktop usage, but can soon limit power users.</p>
+					</blockquote>
+					<h3>Configuring kernel features</h3>
+					<p>The Linux kernel needs a configuration to compile. Doing so indicate whether to compile some features that we may want or, at the opposite, don't need. cloud-hypervisor give arm64 and x86 default config for the guest to work properly. Let's clone the x86 kernel config:</p>
+					<pre><code>~/monerod-microvm$ wget https://raw.githubusercontent.com/cloud-hypervisor/cloud-hypervisor/main/resources/linux-config-x86_64
+~/monerod-microvm$ mv linux-config-x86_64 linux-hardened-6.7/.config // config file need to be named .config in the repo root</code></pre>
+					<h4>Enable free_page_reporting</h4>
+					<p>In order for the guest linux kernel to report host on memory pages freed, <strong>you need to enable <code>free_page_reporting</code> feature</strong>. You can enable it by using the command <code>menuconfig</code> that let you manually toggle kernel features. Use this command:</p>
+					<pre><code>~/monerod-microvm/linux-hardened6.7$ make menuconfig</code></pre>
+					<p>And navigate to</p>
+					<pre><code>Memory Management options -&gt; Free page reporting</code></pre>
+					<p>and toggle it.</p>
+					<blockquote>
+					  <p><strong>Note:</strong> When this feature is disabled, the hypervisor will continue to allow more memory until its configured limit, even if no programs are actually make use of it.</p>
+					</blockquote>
+					<h4>Enable DAMON feature</h4>
+					<p>In order to improve the reclamation of freed memory, we need to enable an obscure feature in the linux kernel called the <em>Data Access MONitor</em> or <em>DAMON</em>. <strong>You need to enable the DAMON and DAMON_RECLAIM feature</strong>. You can find them under:</p>
+					<pre><code>Memory Management options -&gt; Data Access Monitoring</code></pre>
+					<p>Toggle <code>DAMON: Data Access Monitoring Framework</code>, then <code>Data access monitoring operations for the physical address space</code>, and then <code>Build DAMON-based reclaim</code></p>
+					<h4>Compile the kernel</h4>
+					<p>Now let's compile our kernel with make:</p>
+					<pre><code>~/monerod-microvm/linux-hardened6.7$ make -j &lt;NUM THREADS&gt; // number of core</code></pre>
+					<p>If the configuration restart and you're asked in the console to manually select everything, just hold the <em>ENTER</em> key. It is irresponsible but worked for me :p</p>
+					<h2>The image</h2>
+					<h3>The drive format</h3>
+					<p>Now that we have our kernel, we need an actual image to with our system files. Exactly like in bare-metal, a SSD is recommended for reasonable syncing time. It is even more important as the choice of the disk format add a performance overhead. </p>
+					<p>cloud-hypervisor support qcow2, the dynamically sized qemu disk format, and raw, it is raw bytes. qcow2 is a smarter solution as it permit you to easily add more storage to your vm if the blockchain grow, but raw is also a lot faster. I decided to go with raw since my host is using btrfs and that raw disk do not actually allocate place until data is being written. It is a neat feature as now i'm the proud owner of a 500GB partition with 800GB files in it and 200GB of free space ;)</p>
+					<pre><code>~/monerod-microvm$ qemu-img create monerod-disk.ext4 150G // We're going to use a pruned node</code></pre>
+					<h3>The distribution</h3>
+					<p>I originally tested out using Gentoo Hardened/SELinux, Gentoo LLVM/Systemd/SELinux and Arch Linux. It worked great but Gentoo is very painful to install, and most people can also profit from Arch linux features. That's why for this tutorial I decided to go with Arch linux, but you can chose whatever distribution you want as long as you can get the base system somehow without the bootloader or kernel.</p>
+					<pre><code>~/monerod-microvm$ mkdir tmprootfs
+~/monerod-microvm$ sudo mkfs.ext4 monerod-disk.ext4
+~/monerod-microvm$ sudo mount monerod-disk.ext4 tmprootfs/</code></pre>
+					<p>From there you have successfully created an ext4 raw disk were you'll be able to install your system. Again, depending on your distribution, you'll need to install all the system librairies, files and directories. For Gentoo you can copy a stage3 tarball into the disk and chrooting. For Arch linux, the pacstrap tool exist to easily install the base system somewhere:</p>
+					<pre><code>~/monerod-microvm$ sudo pacstrap tmprootfs/ base apparmor networkmanager nano vim wget curl // add whatever package you want</code></pre>
+					<p>Now you need to chroot into your disk to change root password:</p>
+					<pre><code>~/monerod-microvm$ sudo arch-chroot /tmprootfs
+[root@archlinux]# passwd
+// change password
+[root@archlinux]# systemctl enable NetworkManager // Enable network manager for later
+[root@archlinux]# exit
+~/monerod-microvm$ sudo umount /tmprootfs // unmount microvm drive</code></pre>
+					<p>We now have successfully installed Arch Linux base system and some useful utilities in it. You're allowed to say: <em>I'm using Arch btw</em></p>
+					<h2>Setting up NAT</h2>
+					<p>Our microVM will need internet access to work properly. cloud-hypervisor only suppport binding TAP interface in standard mode (no multi queue). We'll also need to setup NAT through host iptables.
+					While a tap interface alone could work. I'll also share with you how to configure it to a bridge for virtual networking. It'll permit you later to run other microVMs that have access to the same subnetwork.</p>
+					<blockquote>
+					  <p><strong>Annotation:</strong>  A Linux bridge is a virtual switch internally handled by the host kernel, it permit you to create sub networks for vms or containers. TUN/TAP is just a driver for virtual network interface. Learn more on this <a href="https://developers.redhat.com/blog/2018/10/22/introduction-to-linux-interfaces-for-virtual-networking">short blog</a></p>
+					</blockquote>
+					<h3>Single TUN/TAP device</h3>
+					<p>When you just wish to connect one microVM, or simply not using a virtual network, the setup is pretty straight forward:
+					Create tap device:</p>
+					<pre><code>~/monerod-microvm$ sudo ip tuntap add dev microvm0 mode tap
+~/monerod-microvm$ sudo ip addr add 192.168.122.1/24 dev microvm0
+~/monerod-microvm$ sudo ip link set dev microvm0 up</code></pre>
+					<p>We just setup a new TAP interface named <code>microvm0</code>, with IPv4 address <code>192.168.122.1</code>, that is part of the network <code>192.168.122.0/24</code></p>
+					<p>Now let's configure iptables:</p>
+					<pre><code>~/monerod-microvm$ sudo iptables -t nat -A POSTROUTING -o &lt;YOUR_HOST_INTERFACE&gt; -j MASQUERADE
+~/monerod-microvm$ sudo iptables -I FORWARD 1 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+~/monerod-microvm$ sudo iptables -I FORWARD 1 -i microvm0 -o &lt;YOUR_HOST_INTERFACE&gt; -j ACCEPT</code></pre>
+					<p>Let's break down these simple commands </p>
+					<ol>
+					<li>First one configure the NAT table to mask the inner address of exiting packets aiming toward the host interface. </li>
+					<li>Second one order the filter to accept incoming packets tracked as <code>ESTABLISHED</code> or <code>RELATED</code>.</li>
+					<li>Third one order the filter to accept packets coming from the microVM to the host interface</li>
+					</ol>
+					<p>Now your interface is fully working!</p>
+					<h3>Linux bridge for VM subnetwork</h3>
+					<p>If you wish to deploy multiple microVM for isolate multiple applications, but still want them to be accessible from each other, you'll need a shared virtual network. Linux bridges are the solution to this problem. You can bind tap interface to bridge and therefore build virtual interfaces linked by it. Let's dive into it:</p>
+					<pre><code>~/monerod-microvm$ sudo ip link add name isolated0 type bridge
+~/monerod-microvm$ sudo ip addr add 192.168.122.1/24 dev isolated0
+~/monerod-microvm$ sudo ip link set dev isolated0 up</code></pre>
+					<p>We just created our linux bridge named <code>isolated0</code> with address <code>192.168.122.1/24</code>, let's reconfigure iptables exactly like above example:</p>
+					<pre><code>~/monerod-microvm$ sudo iptables -t nat -A POSTROUTING -o &lt;YOUR_HOST_INTERFACE&gt; -j MASQUERADE
+~/monerod-microvm$ sudo iptables -I FORWARD 1 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+~/monerod-microvm$ sudo iptables -I FORWARD 1 -i isolated0 -o &lt;YOUR_HOST_INTERFACE&gt; -j ACCEPT</code></pre>
+					<p>When you want to add a new VM to this bridge, create a new TAP interface like so:</p>
+					<pre><code>~/monerod-microvm$ sudo ip tuntap add dev microvm0 mode tap
+~/monerod-microvm$ sudo ip link set microvm0 master isolated0
+~/monerod-microvm$ sudo ip link set dev microvm0 up</code></pre>
+					<h4>Congratulations!</h4>
+					<p>You have successfully setup networking for your VM. There are no DHCP and manual addressing will be require later on. Please be aware that these configurations we just did will be destroyed next reboot. Consider making an init script or using <code>nmcli</code> from <code>NetworkManager</code> directly.</p>
+					<blockquote>
+					  <p><strong>Note:</strong> Please make sure IPv4 forwarding is enabled in the kernel parameters. For systemd users, <code>sysctl -w net.ipv4.ip_forward=1</code> command enable ip forwarding.</p>
+					  <p><strong>Advisory:</strong> <code>iptables</code> have been deprecated. Consider installing <code>nftables</code> and iptables compatibility layer <code>iptables-nft</code> on your host!</p>
+					  <h2>Setting up Hypervisor</h2>
+					</blockquote>
+					<h3>Download cloud-hypervisor</h3>
+					<p>Let's download latest cloud-hypervisor binary release. (you can of course compile it yourself):</p>
+					<pre><code>~/monerod-microvm$ wget https://github.com/cloud-hypervisor/cloud-hypervisor/releases/download/v38.0/cloud-hypervisor-static -o cloud-hypervisor</code></pre>
+					<p>What is great with cloud-hypervisor (even tho firecracker do it better) is its rootless usage. In case you didn't know, the linux kernel have introduced for a while capabilities, that permit you to set what specific binaries or users are capable to do. For our hypervisor to work, it needs to bind our vm to network interfaces. We'll therefore need to attribute the <code>NET_ADMIN</code> capability to the executable:</p>
+					<pre><code>~/monerod-microvm$ sudo setcap cap_net_admin+ep ./cloud-hypervisor</code></pre>
+					<p>We now have an unprivileged hypervisor that is still capable of attributing network interfaces to our microVM. </p>
+					<blockquote>
+					  <p><strong>Note:</strong> from a security perspective, if cloud-hypervisor is exploited and that an attacker is using allowed syscalls (there is seccomp filter), they'll be able to misuse this capability to mess with host's  network. But it is very hard to nearly impossible to do from the guest, and from the host it would require patching the binary or loading a malicious LD_PRELOAD. But tbh nearly all software on Linux can be messed up like this, if you really don't trust your host, consider moving cloud hypervisor behind its own user and setup Mandatory Access Control (through SELinux for example)</p>
+					</blockquote>
+					<h3>The configuration file</h3>
+					<p>In order to easily start our microVM easily with the correct arguments, let's write a simple shell file with the command arguments needed:</p>
+					<pre><code class="bash language-bash">#!/bin/bash
+./cloud-hypervisor \
+--kernel "/path/to/vmlinux" \
+--disk "path=/path/to/monerod-disk.ext4" \
+--cpus boot=8 \
+--cmdline "console=ttyS0 root=/dev/vda rw kernel.panic=-1 damon_reclaim.enabled=Y damon_reclaim.min_age=30000000 vm.vfs_cache_pressure=200  damon_reclaim.wmarks_low=0 damon_reclaim.wmarks_high=1000 damon_reclaim.wmarks_mid=1000" \
+--balloon "deflate_on_oom=on,free_page_reporting=on" \
+--memory "size=6G,hotplug_method=virtio-mem,hotplug_size=512M" \
+--net "tap=microvm0,mac=AC:EF:00:00:00:01,ip=192.168.122.2,mask=255.255.255.0"</code></pre>
+					<p>This actually setup a Linux VM that:</p>
+					<ul>
+					<li>directly boot kernel at <code>/path/to/vmlinux</code></li>
+					<li>bind the drive at <code>path/to/monerod-disk.ext4</code></li>
+					<li>launch with 8 vCPUs and 6GB of RAM</li>
+					<li>have suitable kernel parameters for memory management</li>
+					<li>support <code>free_page_reporting</code></li>
+					<li>bind to tap interface <code>microvm0</code></li>
+					</ul>
+					<p><strong>Some of you will say that this is a large vm and really far from micro</strong>. That's because it isn't yet! monerod needs large amount of RAM and CPU <strong>for initial syncing</strong>. You'll need to give it plenty until it have completely download the database. Once it's done we'll go back and edit the resource usage to a more reasonable amount.</p>
+					<h3>Launching the VM</h3>
+					<p>Now the VM is ready to be launched. Setup the executable bit to the shell file and you should be good to go:</p>
+					<pre><code>~/monerod-microvm$ chmod +x microvm.sh</code></pre>
+					<p>And launch it:</p>
+					<pre><code>~/monerod-microvm$ ./microvm.sh</code></pre>
+					<h2>Post-installation/Guest configuration</h2>
+					<p>If everything goes well, you should have booted up into Arch Linux and successfully logged in.
+					Despite our efforts we still have a lot of things to do.</p>
+					<h3>Network configuration</h3>
+					<p>First things to do is to configure networking. This time we're going to use <code>NetworkManager</code> directly:</p>
+					<pre><code>[root@cloud-hypervisor]# nmcli connection modify eth0 manual yes
+[root@cloud-hypervisor]# nmcli connection modify eth0 ipv4.addresses 192.168.122.&lt;LAST&gt;/24
+[root@cloud-hypervisor]# nmcli connection modify eth0 ipv4.gateway 192.168.122.1</code></pre>
+					<p>With our interface on the correctly configured, the <code>ping 8.8.8.8</code> should work flawlessly</p>
+					<h3>DNS server</h3>
+					<p>You need to set your DNS server into <code>/etc/resolv.conf</code>:</p>
+					<pre><code>// /etc/resolv.conf
+nameserver 1.1.1.1 // Change to whatever</code></pre>
+					<h3>Download and install monerod</h3>
+					<blockquote>
+					  <p><strong>Note:</strong> monerod is available as an official package in the community repository of Arch Linux. However, it have many bugs related to memory allocation. In order to avoid such, the following step will show you how to manually install the official monerod and configure it <em>almost</em> like the official package. If you don't care about these bugs just do <code>pacman -Sy monero</code> </p>
+					</blockquote>
+					<p>Let's download latest official monerod version (v0.18.3.1 as of writing, v0.18.3.2 will be out soon) and verify its hash:</p>
+					<pre><code>[root@cloud-hypervisor]# wget https://downloads.getmonero.org/cli/monero-linux-x64-v0.18.3.1.tar.bz2
+[root@cloud-hypervisor]# sha256sum 23af572fdfe3459b9ab97e2e9aa7e3c11021c955d6064b801a27d7e8c21ae09d monero-linux-x64-v0.18.3.1.tar.bz2
+[root@cloud-hypervisor]# tar xvf monero-linux-x64-v0.18.3.1.tar.bz2 &amp;&amp; cd monero-linux-x64-v0.18.3.1/</code></pre>
+					<p>Now we'll need to transfer the binary to our system:</p>
+					<pre><code>[root@archlinux monero-linux-x64-v0.18.3.1]# install -Dm755 monerod -t /usr/bin</code></pre>
+					<p>Every time you'll want to update monerod, you'll need to repeat this step. (replace the old binary by the new one)</p>
+					<h3>Configuring monerod and unit file</h3>
+					<p>For monerod to run on startup, we need to create a dedicated user for the systemd unit to operate:</p>
+					<pre><code>[root@cloud-hypervisor]# echo "u monero - - /var/lib/monero" &gt; /usr/lib/sysusers.d/monero.conf &amp;&amp; chmod 644 /usr/lib/sysusers.d/monero.conf
+[root@cloud-hypervisor]# echo "d /var/lib/monero 0770 monero monero - -" &gt; /usr/lib/tmpfiles.d/monero.conf &amp;&amp; chmod 644 /usr/lib/tmpfiles.d/monero.conf
+[root@cloud-hypervisor]# systemd-sysusers</code></pre>
+					<p>systemd comes with advanced sandboxing capabilities for spawned process. The default unit file given in the official repository is very permissive, so we can harden it more. Let's write our unit file, located at <code>/usr/lib/systemd/system/monerod.service</code>, for monerod:</p>
+					<pre><code>[Unit]
+Description=Monero Full Node
+After=network.target
+
+[Service]
+User=monero
+Group=monero
+WorkingDirectory=~
+StateDirectory=monero
+LogsDirectory=monero
+
+Type=simple
+ExecStart=/usr/bin/monerod --config-file /etc/monerod.conf --non-interactive
+
+#Hardening
+AmbientCapabilities=
+CapabilityBoundingSet=
+LockPersonality=true
+NoNewPrivileges=True
+SecureBits=noroot-locked
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectProc=invisible
+ProtectSystem=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_NETLINK AF_UNIX
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+					<pre><code>[root@cloud-hypervisor]# chmod 644 /usr/lib/systemd/system/monerod.service
+[root@cloud-hypervisor]# systemctl enable monerod</code></pre>
+					<p>By adding these hardening options you're significantly limiting the scope of action of monerod, and mitigate the consequences of an attack. <a href="https://github.com/monero-project/monero/pull/8838">A more hardened profile have been proposed in the past</a></p>
+					<p>Now let's write our configuration file at <code>/etc/monerod.conf</code>:</p>
+					<pre><code class="txt language-txt">data-dir=/var/lib/monero/
+log-file=/var/log/monero/monero.log
+log-level=0
+
+# Add these arguments
+# Database
+prune-blockchain=1 # We prune the blockchain
+sync-pruned-blocks=1 # we allow syncing from pruned blocks
+
+# Network
+hide-my-port=1 # We don't advertise our ports to network peers
+enable-dns-blocklist=1 # DNS blocklist
+pad-transactions=1 # Pad relayed transactions to the next kB to help defend against traffic volume analysis
+no-zmq=1 # No need for ZMQ since we aren't mining
+
+# RPC
+restricted-rpc=1 # restricted rpc</code></pre>
+					<pre><code>[root@cloud-hypervisor]# chmod 644 /etc/monerod.conf</code></pre>
+					<p>I also invite you to configure RPC login and RPC SSL. (I won't cover this in this tutorial)</p>
+					<h3>Start it</h3>
+					<p>To start monerod you can simply reboot your vm or type <code>systemctl start monerod</code></p>
+					<h2>Post-syncing</h2>
+					<p>Once the node is fully synced, informations you can get from journalctl (<code>systemctl status monerod</code>), you can go back edit the resource limit in your cloud-hypervisor shell file. 3GB is actually good enough for a private monero node, and you aren't obligated to use all your CPU cores.</p>
+					<p>Once you've rebooted you should be able to connect to your local monero, fully virtualized monero node at <code>192.168.100.&lt;LAST&gt;:18081</code></p>
+					<h2>Performance and Efficiency</h2>
+					<p><strong>Here's the bad news</strong>, you'll quickly see that our monero node is consuming at least 1.4GB. cloud-hypervisor is actually only 50~200MB of memory overhead. The Linux kernel alone take &lt;100MB. This huge memory usage isn't due to monerod, but to Linux. The kernel have a perverse tendency to cache everything in RAM, and consider itself to be in the right to use all of it… The kernel parameters and features we enabled helped at mitigating the issue, but this is how the kernel works, and no native features exist to limit this behavior. Consider the linux kernel to take at least 50% of the available RAM for caching, even tho the total used by programs are near 150MB.</p>
+					<p>As for the CPU performance, the overhead is exactly the same as QEMU/KVM one, expect <strong>at most</strong> a 10% performance regression.</p>
+					<h2>Final thoughts</h2>
+					<p>If you manage to read all the way done here, thanks you. It was really exciting for me to try and discover new things on the current virtualization implementation, and I hoped it did to you as well. I really hope that in the future we might expect comparable efficiency to OS-level virtualization. At least for know, i'm the proud of my server. Here's my current configuration:</p>
+					<pre><code>&lt;INTERNET&gt;
+└── &lt;Firewall microVM|OPNsense&gt; (QEMU/KVM wEDK2)
+		└──(Bridge isolated0)
+				├── &lt;monero-wallet-rpc MicroVM|Gentoo Hardened/SELinux&gt; (cloud-hypervisor)
+				└── &lt;Monerod MicroVM|Gentoo LLVM/SELinux&gt; (cloud-hypervisor)
+
+Memory usage: 4 to 8GB
+Storage usage: 200GB</code></pre>
+					<p>And I plan at adding more services as I can just copy paste the disk file.</p>
+					<p>Again thanks for reading and here's a non exhaustive collection of additional insights I had during this experiment:</p>
+					<ul>
+					<li>If monerod was ported to redoxOS, a near native memory efficiency would be possible. But i'm too lazy to read out the cookbook and compile it. (but for real, all this memory issue would be gone and a true microVM would be possible. This is a cry for help)</li>
+					<li>It is possible to setup a cron job to periodically drop cached memory in the linux kernel using `echo 3 > /proc/sys/vm/drop_caches`. But it hurts performance significantly.</li>
+					<li>OPNsense and other BSD distributions don't work under cloud-hypervisor</li>
+					<li>Libvirt iptables are shit and blocked me during 3 days (5th time I  have issue with libvirt)</li>
+					<li>If one wish to run other services more efficiently, they could use one microVM with multiple containers inside it.</li>
+					<li>Windows Server can run in headless mode, I didn't knew that</li>
+					<li>From a threat model perspective, nftables and virtio are the only attack surface to the host.</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</body>
